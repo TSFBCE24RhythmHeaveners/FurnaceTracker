@@ -2347,6 +2347,21 @@ void DivEngine::registerSystems() {
     {}
     );
 
+  sysDefs[DIV_SYSTEM_TASIS]=new DivSysDef(
+  _("Tasis"), NULL, 0x100, 0, 8, 1, 8,
+  true, true, 0, false, 1U<<DIV_SAMPLE_DEPTH_16BIT, 0, 0, _("Tasis Synth"),
+  DivChanDefFunc([](unsigned short ch) -> DivChanDef {
+    return DivChanDef(fmt::sprintf(_("Channel %d"),ch+1),
+    fmt::sprintf(_("CH%d"),ch+1),
+    DIV_CH_FM,
+    DIV_INS_CSE1,
+    DIV_INS_AMIGA
+    );
+  }),
+  {},
+  {}
+  );
+
   sysDefs[DIV_SYSTEM_MSM6295]=new DivSysDef(
     _("OKI MSM6295"), NULL, 0xaa, 0, 4, 4, 4,
     false, true, 0x161, false, 1U<<DIV_SAMPLE_DEPTH_VOX, 0, 0,

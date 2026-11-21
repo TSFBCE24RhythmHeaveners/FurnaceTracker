@@ -1395,6 +1395,7 @@ const int availableSystems[]={
   DIV_SYSTEM_MULTIPCM,
   DIV_SYSTEM_KLATTSCH,
   DIV_SYSTEM_CSE1,
+  DIV_SYSTEM_TASIS,
   0 // don't remove this last one!
 };
 
@@ -1503,6 +1504,7 @@ const int chipsSpecial[]={
   DIV_SYSTEM_SID3,
   DIV_SYSTEM_KLATTSCH,
   DIV_SYSTEM_CSE1,
+  DIV_SYSTEM_TASIS,
   0 // don't remove this last one!
 };
 

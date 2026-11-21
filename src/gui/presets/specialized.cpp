@@ -115,6 +115,10 @@ void initSystemPresetsSpecialized(std::vector<FurnaceGUISysCategory>& sysCategor
       CH(DIV_SYSTEM_CSE1, 1.0f, 0, "")
     })
   ENTRY(
+  _("Tasis"), {
+    CH(DIV_SYSTEM_TASIS, 1.0f, 0, "")
+  })
+  ENTRY(
     _("PowerNoise"), {
       CH(DIV_SYSTEM_POWERNOISE, 1.0f, 0, "")
     }

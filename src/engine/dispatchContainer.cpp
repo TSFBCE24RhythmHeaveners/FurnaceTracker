@@ -99,6 +99,7 @@
 #include "../ta-log.h"
 #include "song.h"
 #include "platform/cse1.h"
+#include "platform/ctasis.h"
 
 void DivDispatchContainer::setRates(double gotRate) {
   int outs=dispatch->getOutputCount();
@@ -667,6 +668,9 @@ void DivDispatchContainer::init(DivSystem sys, DivEngine* eng, int chanCount, do
       break;
     case DIV_SYSTEM_CSE1:
       dispatch=new DivPlatformCSE1;
+      break;
+    case DIV_SYSTEM_TASIS:
+      dispatch=new DivPlatformTasis;
       break;
     case DIV_SYSTEM_MSM6258:
       dispatch=new DivPlatformMSM6258;
