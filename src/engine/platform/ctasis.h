@@ -14,7 +14,7 @@ class DivPlatformTasis : public DivDispatch {
 
     Channel chan[TASIS_MAX_CHANNEL];
     TASIS_CHANNEL chip_base[TASIS_MAX_CHANNEL]{};
-    TASIS_WAVETABLE waveTable{};
+    TASIS_WAVETABLE* waveTable = nullptr;
     TASIS_CONFIG config{};
     TASIS_REG* pcmMem{};
 
