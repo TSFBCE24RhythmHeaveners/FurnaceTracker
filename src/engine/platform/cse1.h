@@ -40,13 +40,12 @@ class DivPlatformCSE1 : public DivDispatch {
     int sysIDCache;
     int oldVolume[2];
     int newVolume[2];
-    bool oldMixer;
+
     bool amigaVolumeLike;
 
     friend void putDispatchChip(void*,int);
     friend void putDispatchChan(void*,int,int);
 public:
-    void acquire(short** buf, size_t len) override;
     void acquireDirect(blip_buffer_t **bb, size_t len) override;
     bool hasAcquireDirect() override;
     bool hasSoftPan(int ch) override;

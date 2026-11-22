@@ -3177,12 +3177,9 @@ bool FurnaceGUI::drawSysConf(int chan, int sysPos, DivSystem type, DivConfig& fl
       if (ImGui::Checkbox(_("Not FM"),&notfm)) {
         altered=true;
       }
-      if (ImGui::IsItemHovered()) {
-        ImGui::SetTooltip(_("Warning! ...")); // TODO: 补充简介
-      }
 
-      bool oldMixer = flags.getBool("oldMixer",false);
-      if (ImGui::Checkbox(_("Old Mixer"),&oldMixer)) {
+      bool oldMixer = flags.getBool("use_linear",false);
+      if (ImGui::Checkbox(_("Use Linear"),&oldMixer)) {
         altered=true;
       }
 
@@ -3198,7 +3195,7 @@ bool FurnaceGUI::drawSysConf(int chan, int sysPos, DivSystem type, DivConfig& fl
           flags.set("quarterClock",(int)quarterClock);
           flags.set("not_fm",(int)notfm);
           flags.set("revision",revision);
-          flags.set("oldMixer",oldMixer);
+          flags.set("use_linear",oldMixer);
           flags.set("amiga_volume_like",amigaVolumeLike);
         });
       }

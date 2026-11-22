@@ -290,12 +290,10 @@ namespace CSE1_PACKED {
         }
         add_phase += PHASE>>16;
 
-        if (FLAGS_A.GET_WAVE() < 6) {
-            const CSE1_REG wv = option_wavetable(wave_table, add_phase&0xffff);
-            VFB = (!FLAGS_A.GET_NOT_DEFAULT_OUT_AND_WAVE_TABLE_TABLE() ? wv : wave_table.memPCM[WAVE_TABLE_TABLE+wv]^0x8000)^0x8000;
-        } else {
-            VFB = wave_table.memPCM[PHASE];
-        }
+
+        const CSE1_REG wv = option_wavetable(wave_table, add_phase&0xffff);
+        VFB = (!FLAGS_A.GET_NOT_DEFAULT_OUT_AND_WAVE_TABLE_TABLE() ? wv : wave_table.memPCM[WAVE_TABLE_TABLE+wv]^0x8000)^0x8000;
+
         VFB = bit_cast<int16_t>(VFB) * (!FLAGS_A.GET_NOT_DEFAULT_ADSR_TABLE() ? wave_table.volume_line[ENV_STATE.ENV_VP] : wave_table.memPCM[ADSR_WAVE_TABLE+ENV_STATE.ENV_VP]) >> 16;
     }
 
@@ -418,7 +416,7 @@ namespace CSE1_PACKED {
     CSE1_REG CSE1_OPER_STATE::option_wavetable(const CSE1_CONFIG_AND_TABLE &wave_table, const CSE1_REG index) noexcept {
         switch (this->FLAGS_A.GET_WAVE()) {
             case SINE: {
-                return wave_table.sine[index];
+                return wave_table.sine[index] ;
             }
             case TRIANGLE: {
                 return wave_table.triangle[index];
@@ -472,11 +470,18 @@ namespace CSE1_PACKED {
             case OPER_WAVETABLE_SAMPLE: {
                 return wave_table.memPCM[index+START_PHASE]^0x8000;
             }
+            case OPER_ONESHOT_SAMPLE:
+            case OPER_LOOP_SAMPLE: {
+                return wave_table.enable_linear ?
+                ((wave_table.memPCM[PHASE]^0x8000)*static_cast<CSE1_REG>(~DUTY)>>16)
+                + ((wave_table.memPCM[PHASE+1 <= END_PHASE ? PHASE+1 : PHASE-END_PHASE+START_PHASE]^0x8000)*DUTY>>16)
+                : wave_table.memPCM[PHASE]^0x8000;
+            }
             default: return 0;
         }
     }
 
-    CSE1_CONFIG_AND_TABLE::CSE1_CONFIG_AND_TABLE(): default_volume_line(1), memPCM(nullptr), fastSpeed(0x4000), chipType(CSE1_2), not_fm(false) {
+    CSE1_CONFIG_AND_TABLE::CSE1_CONFIG_AND_TABLE(): memPCM(nullptr), default_volume_line(1), fastSpeed(0x4000), chipType(CSE1_2), not_fm(false), enable_linear(true) {
         for (size_t i = 0; i < sine.size(); i++) {
             sine[i] = static_cast<CSE1_REG>(std::sin(static_cast<long double>(i)*2*PI/65536.0L)*32767.0+32768.0)&0xffff;
         }

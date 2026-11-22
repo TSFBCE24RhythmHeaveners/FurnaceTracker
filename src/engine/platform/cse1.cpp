@@ -7,38 +7,6 @@
 
 #define MEMORY_SIZE (16*1024*1024)
 
-void DivPlatformCSE1::acquire(short** buf, size_t len) {
-    for (int i = 0; i < chans; i++) {
-        oscBuf[i]->begin(len);
-    }
-
-    for (size_t i = 0; i < len; i++) {
-      chip.clock(waveTable);
-      newVolume[0] = 0;
-      newVolume[1] = 0;
-
-      for (unsigned char j = 0; j < chans; j++) {
-        if (!isMuted[j]) {
-          oscBuf[j]->putSample(i, chip.CSE1_GET_SAMPLE(j));
-          newVolume[0] += chip.CHANNELS.OUTS_L[j];
-          newVolume[1] += chip.CHANNELS.OUTS_R[j];
-        } else {
-          oscBuf[j]->putSample(i, 0);
-        }
-      }
-
-      buf[0][i] = MAX(MIN(newVolume[0], 32767), -32768);
-      buf[1][i] = MAX(MIN(newVolume[1], 32767), -32768);
-
-      oldVolume[0] = newVolume[0];
-      oldVolume[1] = newVolume[1];
-    }
-
-    for (int i = 0; i < chans; i++) {
-        oscBuf[i]->end(len);
-    }
-}
-
 void DivPlatformCSE1::acquireDirect(blip_buffer_t** bb, size_t len) {
   unsigned int sharedNeedlePos=oscBuf[0]->needle;
   for (const auto & i : oscBuf) {
@@ -66,7 +34,7 @@ void DivPlatformCSE1::acquireDirect(blip_buffer_t** bb, size_t len) {
 }
 
 bool DivPlatformCSE1::hasAcquireDirect() {
-  return !oldMixer;
+  return true;
 }
 
 bool DivPlatformCSE1::hasSoftPan(int ch) {
@@ -217,8 +185,8 @@ void DivPlatformCSE1::tick(bool sysTick) {
     const auto originOutR = static_cast<uint64_t>(chan[i].outR) * chan[i].m_outA>>16;
     const auto outLbuf = originVol < 0xffff ? (originOutL*chan[i].m_outL>>16)*originVol>>16 : (originOutL*chan[i].m_outL>>16);
     const auto outRbuf = originVol < 0xffff ? (originOutR*chan[i].m_outR>>16)*originVol>>16 : (originOutR*chan[i].m_outR>>16);
-    chip.CHANNELS.CHANNEL[i].OUT.OUT_L = chan[i].outL2 < 0xff ? outLbuf * chan[i].outL2>>8 : outLbuf;
-    chip.CHANNELS.CHANNEL[i].OUT.OUT_R= chan[i].outR2 < 0xff ? outRbuf * chan[i].outR2>>8 : outRbuf;
+    chip.CHANNELS.CHANNEL[i].OUT.OUT_L = (chan[i].outL2) < 0xff ? outLbuf * chan[i].outL2>>8 : outLbuf;
+    chip.CHANNELS.CHANNEL[i].OUT.OUT_R= (chan[i].outR2) < 0xff ? outRbuf * chan[i].outR2>>8 : outRbuf;
   }
 }
 
@@ -570,7 +538,7 @@ void DivPlatformCSE1::setFlags(const DivConfig& flags) {
   chipClock=192000;
   CHECK_CUSTOM_CLOCK
   chipClock = flags.getBool("quarterClock",false) ? chipClock / 4 : chipClock;
-  oldMixer = flags.getBool("oldMixer",false);
+  waveTable.enable_linear = flags.getBool("use_linear",false);
   rate=chipClock;
   for (int i = 0; i < chans; i++) {
     oscBuf[i]->setRate(rate);

@@ -247,11 +247,12 @@ namespace CSE1_PACKED {
         std::array<CSE1_REG, 65536> triangle{};
         std::array<CSE1_REG, 65536> volume_line{};
         std::array<float, 65536> cutoffTable{};
-        CSE1_REG default_volume_line;
         CSE1_REG* memPCM;
+        CSE1_REG default_volume_line;
         CSE1_REG fastSpeed;
         CSE1_CHIP_VERSION chipType;
         bool not_fm;
+        bool enable_linear;
 
         CSE1_CONFIG_AND_TABLE();
 
