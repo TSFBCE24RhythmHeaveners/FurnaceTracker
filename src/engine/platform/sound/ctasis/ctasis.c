@@ -24,6 +24,6 @@ void TASIS_CLOCK(struct TASIS_CHANNEL* tasisChannel, struct TASIS_CONFIG* tasisC
 void TASIS_WAVETABLE_RESET(struct TASIS_WAVETABLE* tasis_wavetable, struct TASIS_CONFIG* tasis_config) {
     for (int i = 0; i < TASIS_WAVE_POINTS; ++i) {
         tasis_wavetable->SINE[i] = (TASIS_REG)(sin(i*2*TASIS_PI/65535.0)*32767.0+32768.0);
-        tasis_wavetable->TRI[i] = i;
+        tasis_wavetable->TRI[i] = (TASIS_REG)(asin(sin(i*2*TASIS_PI/65535.0))/TASIS_PI*2*32767.0);
     }
 }

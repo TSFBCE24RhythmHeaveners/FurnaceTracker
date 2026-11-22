@@ -14,6 +14,7 @@ namespace CSE1_REG_INS_SYNC {
             op.PHASE = ins->op[a].phase;
             op.FLAGS_A.SET_WAVE(ins->op[a].wave);
             op.DUTY = ins->op[a].duty;
+            op.LFSR_TAPS = ins->op[a].lfsr_taps;
 
             op.ADSR.AR = ins->op[a].adsr.ar;
             op.ADSR.DR = ins->op[a].adsr.dr;
@@ -81,6 +82,7 @@ namespace CSE1_REG_INS_SYNC {
             ins->op[a].phase = op.PHASE;
             ins->op[a].wave = op.FLAGS_A.GET_WAVE();
             ins->op[a].duty = op.DUTY;
+            ins->op[a].lfsr_taps = op.LFSR_TAPS;
 
             ins->op[a].adsr.ar = op.ADSR.AR;
             ins->op[a].adsr.dr = op.ADSR.DR;

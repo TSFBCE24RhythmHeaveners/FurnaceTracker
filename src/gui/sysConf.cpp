@@ -3111,12 +3111,16 @@ bool FurnaceGUI::drawSysConf(int chan, int sysPos, DivSystem type, DivConfig& fl
         revision=0;
         altered=true;
       }
-      if (ImGui::RadioButton("CSE-1.1 (Fix\?..No No No, is REPLACE ENVELOPE!!!)",revision==1)) {
+      if (ImGui::RadioButton("CSE-1.1 (Divider Envelope)",revision==1)) {
         revision=1;
         altered=true;
       }
-      if (ImGui::RadioButton("CSE-1.2 (A!Filter)",revision==2)) {
+      if (ImGui::RadioButton("CSE-1.2 (TPT-ZDF SVF Filter)",revision==2)) {
         revision=2;
+        altered=true;
+      }
+      if (ImGui::RadioButton("CSE-1.3 (New Noise)",revision==3)) {
+        revision=3;
         altered=true;
       }
       ImGui::Unindent();

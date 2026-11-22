@@ -92,7 +92,7 @@ namespace CSE1_PACKED {
     struct CSE1_OPER_STATE {
         CSE1_MIS MIS;
         CSE1_ADSR ADSR;
-        CSE1_REG dummy1;
+        CSE1_REG LFSR_TAPS;
         CSE1_OPER_ENV_STATE ENV_STATE;
         CSE1_DOUBLE_REG PHASE;
         CSE1_DOUBLE_REG PITCH;
@@ -239,6 +239,7 @@ namespace CSE1_PACKED {
         CSE1_0,
         CSE1_1,
         CSE1_2,
+        CSE1_3,
     };
 
     struct CSE1_CONFIG_AND_TABLE {

@@ -1088,7 +1088,7 @@ struct DivInstrumentCSE1 {
     unsigned short hpitch{};
     unsigned short lpitch{};
 
-
+    unsigned short lfsr_taps{};
     unsigned char ml{ 1 };
     unsigned char dn{ 4 };
     unsigned char wave{};

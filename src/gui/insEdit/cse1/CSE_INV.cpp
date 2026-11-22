@@ -114,6 +114,77 @@ void FurnaceGUI::drawInsCSE1(DivInstrument *ins) {
                     "DUTY: %d"
                 ));
 
+                // ImGui::SetNextItemWidth(-FLT_MIN);
+                // P(ImGui::SliderScalar(
+                //     "##LFSR_TAPS",
+                //     ImGuiDataType_U16,
+                //     &cse1.op[i].lfsr_taps,
+                //     &gen_min, &gen_max,
+                //     "LFSR_TAPS: %d"
+                // ));
+
+                // ---- LFSR_TAPS：位掩码编辑器（替代 SliderScalar）----
+{
+    // 1. 框内：16 格散点缩影（只读状态展示，占位与原 slider 相同）
+    ImVec2 pos = ImGui::GetCursorScreenPos();
+    float h = ImGui::GetFrameHeight();
+    float w = ImGui::GetContentRegionAvail().x;
+
+    ImGui::PushStyleColor(ImGuiCol_Button,        ImGui::GetColorU32(ImGuiCol_FrameBg));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::GetColorU32(ImGuiCol_FrameBgHovered));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive,  ImGui::GetColorU32(ImGuiCol_FrameBgActive));
+    bool open = ImGui::Button(fmt::sprintf("##LFSR_TAPS%d", i).c_str(), ImVec2(w, h));
+    ImGui::PopStyleColor(3);
+
+    ImDrawList* dl = ImGui::GetWindowDrawList();
+    float bw = 3.0f, bh = h * 0.45f;
+    float x0 = pos.x + 6.0f;
+    float y0 = pos.y + (h - bh) * 0.5f;
+    ImU32 colOn  = ImGui::GetColorU32(ImGuiCol_CheckMark);
+    ImU32 colOff = ImGui::GetColorU32(ImGuiCol_FrameBg, 0.8f);
+    for (int b = 0; b < 16; b++) {
+        bool on = (cse1.op[i].lfsr_taps >> (15 - b)) & 1;
+        dl->AddRectFilled(ImVec2(x0 + b * (bw + 1), y0),
+                          ImVec2(x0 + b * (bw + 1) + bw, y0 + bh),
+                          on ? colOn : colOff);
+    }
+
+    // 2. 点击开 popup（裸调用，不触发 P 的 modified/通知链）
+    if (open)
+        ImGui::OpenPopup(fmt::sprintf("lfsr_taps_popup%d", i).c_str());
+}
+
+if (ImGui::BeginPopup(fmt::sprintf("lfsr_taps_popup%d", i).c_str())) {
+    ImGui::SeparatorText(_("LFSR_TAPS"));
+
+    // 3. 16 个位开关：两行 8 个，MSB 在左上，与缩影同映射；手动压缩间距
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.0f, 0.0f));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing,  ImVec2(ImGui::GetStyle().ItemInnerSpacing.x, 0.0f));
+
+    for (int row = 0; row < 2; row++) {
+        for (int c = 0; c < 8; c++) {
+            int b = 15 - row * 8 - c;
+            ImGui::PushID(b);
+            bool bit = (cse1.op[i].lfsr_taps >> b) & 1;
+            if (ImGui::Checkbox("##bit", &bit)) {
+                MARK_MODIFIED;
+                e->notifyInsChange(curIns);
+                updateFMPreview=true;
+                if (bit) cse1.op[i].lfsr_taps |=  (1u << b);
+                else     cse1.op[i].lfsr_taps &= ~(1u << b);
+            }
+            ImGui::PopID();
+            ImGui::SameLine();
+        }
+        ImGui::NewLine();
+    }
+
+    ImGui::PopStyleVar(2);
+
+    ImGui::EndPopup();
+}
+
+
                 const String& wName = waveTableMenu[cse1.op[i].wave&0x7];
 
                 ImGui::AlignTextToFramePadding();

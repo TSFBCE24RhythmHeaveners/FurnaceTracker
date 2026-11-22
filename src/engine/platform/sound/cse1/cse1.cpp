@@ -48,17 +48,20 @@ namespace CSE1_PACKED {
             case CSE1_0:
             case CSE1_1: {
                 for (size_t f = 0; f < SPEC.FILTERS.size(); f++) {
+                    // Chamberlin SVF (Digital)
                     SPEC.FILTERS[f].clock_1(value, f, LeftBuf2, RightBuf2);
                     LeftBuf3 += value.VFB_L[f]*SPEC.FILTERS[f].OUT_L>>16;
                     RightBuf3 += value.VFB_R[f]*SPEC.FILTERS[f].OUT_R>>16;
                 }
                 break;
             }
-            case CSE1_2: {
+            case CSE1_2:
+            case CSE1_3: {
                 for (size_t f = 0; f < SPEC.FILTERS.size(); f++) {
+                    // TPT-ZDF SVF (Analog)
                     SPEC.FILTERS[f].clock_1_2(wave_table, f, value, LeftBuf2, RightBuf2);
-                    LeftBuf3 += static_cast<int16_t>(bit_cast<float>(value.VFB_L[f])*32767.0f)*SPEC.FILTERS[f].OUT_L>>16;
-                    RightBuf3 += static_cast<int16_t>(bit_cast<float>(value.VFB_R[f])*32767.0f)*SPEC.FILTERS[f].OUT_R>>16;
+                    LeftBuf3 += static_cast<int16_t>(std::max(std::min(bit_cast<float>(value.VFB_L[f]), 1.0f), -1.0f)*32767.0f)*SPEC.FILTERS[f].OUT_L>>16;
+                    RightBuf3 += static_cast<int16_t>(std::max(std::min(bit_cast<float>(value.VFB_R[f]), 1.0f), -1.0f)*32767.0f)*SPEC.FILTERS[f].OUT_R>>16;
                 }
                 break;
             }
@@ -273,7 +276,8 @@ namespace CSE1_PACKED {
                 break;
             }
             case CSE1_1:
-            case CSE1_2: {
+            case CSE1_2:
+            case CSE1_3: {
                 this->ENV_STATE.clock_1_1(this, this->ADSR);
                 break;
             }
@@ -426,9 +430,42 @@ namespace CSE1_PACKED {
                 return index;
             }
             case OPER_NOISE: {
-                if (this->PHASE & 0x10000000) {
-                    this->PHASE &= 0x0fffffff;
-                    this->DUTY = (this->DUTY >> 1) | (((this->DUTY ^ (this->DUTY >> 2) ^ (this->DUTY >> 3) ^ (this->DUTY >> 5)) & 1) << 15);
+                switch (wave_table.chipType) {
+                    case CSE1_0:
+                    case CSE1_1:
+                    case CSE1_2: {
+                        if (this->PHASE & 0x10000000) {
+                            this->PHASE &= 0x0fffffff;
+                            this->DUTY = (this->DUTY >> 1) | (((this->DUTY ^ (this->DUTY >> 2) ^ (this->DUTY >> 3) ^ (this->DUTY >> 5)) & 1) << 15);
+                        }
+                        break;
+                    }
+                    case CSE1_3: {
+                        if (this->PHASE & 0x10000000) {
+                            this->PHASE &= 0x0fffffff;
+                            this->DUTY = (this->DUTY >> 1) | ((
+                                (
+                                    ((this->DUTY >> 0x0) & (this->LFSR_TAPS >> 0x0)) ^
+                                    ((this->DUTY >> 0x1) & (this->LFSR_TAPS >> 0x1)) ^
+                                    ((this->DUTY >> 0x2) & (this->LFSR_TAPS >> 0x2)) ^
+                                    ((this->DUTY >> 0x3) & (this->LFSR_TAPS >> 0x3)) ^
+                                    ((this->DUTY >> 0x4) & (this->LFSR_TAPS >> 0x4)) ^
+                                    ((this->DUTY >> 0x5) & (this->LFSR_TAPS >> 0x5)) ^
+                                    ((this->DUTY >> 0x6) & (this->LFSR_TAPS >> 0x6)) ^
+                                    ((this->DUTY >> 0x7) & (this->LFSR_TAPS >> 0x7)) ^
+                                    ((this->DUTY >> 0x8) & (this->LFSR_TAPS >> 0x8)) ^
+                                    ((this->DUTY >> 0x9) & (this->LFSR_TAPS >> 0x9)) ^
+                                    ((this->DUTY >> 0xA) & (this->LFSR_TAPS >> 0xA)) ^
+                                    ((this->DUTY >> 0xB) & (this->LFSR_TAPS >> 0xB)) ^
+                                    ((this->DUTY >> 0xC) & (this->LFSR_TAPS >> 0xC)) ^
+                                    ((this->DUTY >> 0xD) & (this->LFSR_TAPS >> 0xD)) ^
+                                    ((this->DUTY >> 0xE) & (this->LFSR_TAPS >> 0xE)) ^
+                                    ((this->DUTY >> 0xF) & (this->LFSR_TAPS >> 0xF))
+                                    )&1
+                                )<<15);
+                        }
+                        break;
+                    }
                 }
                 return BIT_EX(this->DUTY & 1);
             }
