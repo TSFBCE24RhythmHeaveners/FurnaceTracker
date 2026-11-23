@@ -130,6 +130,7 @@ static const char* opl2Cores[]={
   "Nuked-OPL3",
   "ymfm",
   "YM3812-LLE",
+  "Nuked-CQM",
   "Nuked-OPL2 Lite"
 };
 
@@ -627,10 +628,6 @@ void FurnaceGUI::initSettings() {
         _N("Save unused patterns"),
         saveUnusedPatterns
       ),
-      SETTING_CHECKBOX(
-        _N("Don't apply compatibility flags when loading .dmf"),
-        noDMFCompat
-      ).Tooltip(_("do not report any issues arising from the use of this option!")),
       SettingEntry::Radio(
         _N("Play after opening song:"),"playOnLoad",&settings.playOnLoad,{
         {_N("No##pol0"),0},
@@ -919,6 +916,10 @@ void FurnaceGUI::initSettings() {
     }),
     // TODO: configuration import/export/reset options should be in a menu next to search.
     SUBCATEGORY(_N("Import"),{
+      SETTING_CHECKBOX(
+        _N("Don't apply compatibility flags when loading .dmf"),
+        noDMFCompat
+      ).Tooltip(_("do not report any issues arising from the use of this option!")),
       SETTING_CHECKBOX(
         _N("Use OPL3 instead of OPL2 for S3M import"),
         s3mOPL3
