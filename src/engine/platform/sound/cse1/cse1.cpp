@@ -470,7 +470,13 @@ namespace CSE1_PACKED {
             case OPER_WAVETABLE_SAMPLE: {
                 return wave_table.memPCM[index+START_PHASE];
             }
-            case OPER_ONESHOT_SAMPLE:
+            case OPER_ONESHOT_SAMPLE: {
+                return wave_table.enable_linear ?
+                ((wave_table.memPCM[PHASE]^0x8000)*static_cast<CSE1_REG>(~DUTY)>>16)
+                + ((wave_table.memPCM[PHASE+1 <= END_PHASE ? PHASE+1 : END_PHASE]^0x8000)*DUTY>>16)
+                ^ 0x8000
+                : wave_table.memPCM[PHASE];
+            }
             case OPER_LOOP_SAMPLE: {
                 return wave_table.enable_linear ?
                 ((wave_table.memPCM[PHASE]^0x8000)*static_cast<CSE1_REG>(~DUTY)>>16)
