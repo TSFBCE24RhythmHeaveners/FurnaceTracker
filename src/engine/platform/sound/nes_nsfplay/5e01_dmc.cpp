@@ -50,7 +50,7 @@ namespace xgm
     option[OPT_ENABLE_4011] = 1;
     option[OPT_ENABLE_PNOISE] = 1;
     option[OPT_UNMUTE_ON_RESET] = 1;
-    option[OPT_DPCM_ANTI_CLICK] = 0;
+    option[OPT_DPCM_ANTI_CLICK] = 1;
     option[OPT_NONLINEAR_MIXER] = 1;
     option[OPT_RANDOMIZE_NOISE] = 1;
     option[OPT_RANDOMIZE_TRI] = 1;
