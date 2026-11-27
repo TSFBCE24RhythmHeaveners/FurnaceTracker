@@ -3116,6 +3116,7 @@ bool FurnaceGUI::drawSysConf(int chan, int sysPos, DivSystem type, DivConfig& fl
     case DIV_SYSTEM_CSE1: {
       constexpr int gen_min = 0;
       constexpr int gen_max = 65535;
+      constexpr int iter_max = 16;
 
       int revision=flags.getInt("revision",1);
 
@@ -3173,9 +3174,18 @@ bool FurnaceGUI::drawSysConf(int chan, int sysPos, DivSystem type, DivConfig& fl
         ImGui::SetTooltip(_("Default clock speed is 192kHz (192000Hz)."));
       }
 
-      bool notfm=flags.getBool("not_fm",false);
-      if (ImGui::Checkbox(_("Not FM"),&notfm)) {
-        altered=true;
+      bool not_fm = flags.getBool("not_fm",false);
+
+      if (not_fm && ImGui::Checkbox(_("Not FM (Old)"),&not_fm)) {
+        altered = true;
+      }
+
+      uint8_t fm_iters=flags.getInt("fm_iters",1);
+
+      if (!not_fm) {
+        if (ImGui::SliderScalar("FM Iters", ImGuiDataType_U8, &fm_iters, &gen_min, &iter_max)) {
+          altered=true;
+        }
       }
 
       bool oldMixer = flags.getBool("use_linear",false);
@@ -3193,7 +3203,8 @@ bool FurnaceGUI::drawSysConf(int chan, int sysPos, DivSystem type, DivConfig& fl
           flags.set("defaultVolumeTableType",dvtt);
           flags.set("defaultVolumeTableSpeed", dvtspeed);
           flags.set("quarterClock",(int)quarterClock);
-          flags.set("not_fm",(int)notfm);
+          flags.set("not_fm",(int)not_fm);
+          flags.set("fm_iters",fm_iters);
           flags.set("revision",revision);
           flags.set("use_linear",oldMixer);
           flags.set("amiga_volume_like",amigaVolumeLike);
