@@ -406,10 +406,10 @@ namespace CSE1_PACKED {
         const CSE1_REG index) noexcept {
         switch (shape) {
             case SINE: {
-                return wave_table.sine[index];
+                return wave_table.sine[index]^0x8000;
             }
             case TRIANGLE: {
-                return wave_table.triangle[index];
+                return wave_table.triangle[index]^0x8000;
             }
             case SQUARE: {
                 return BIT_EX(index&0x8000);
