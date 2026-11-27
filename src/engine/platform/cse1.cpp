@@ -270,8 +270,7 @@ int DivPlatformCSE1::dispatch(DivCommand c) {
             break;
           }
 
-          case DIV_INS_CSE1:
-          default: {
+          case DIV_INS_CSE1: {
             auto cse1 = ins->cse1;
             chan[c.chan].pitchTable = &pitchTable;
             chan[c.chan].outL = cse1.out.outLeft;
@@ -309,6 +308,7 @@ int DivPlatformCSE1::dispatch(DivCommand c) {
             CSE1_REG_INS_SYNC::ins_to_reg(&cse1, &chip.CHANNELS.CHANNEL[c.chan]);
             break;
           }
+          default: break;
         }
         chan[c.chan].macroInit(ins);
       }
@@ -545,7 +545,13 @@ void DivPlatformCSE1::setFlags(const DivConfig& flags) {
   }
   waveTable.default_volume_line = flags.getInt("defaultVolumeTableType",1);
   waveTable.fastSpeed = flags.getInt("defaultVolumeTableSpeed",0x4000);
-  waveTable.not_fm = flags.getBool("not_fm",false);
+
+  waveTable.fm_iter = flags.getInt("fm_iters",1);
+
+  if (flags.getBool("not_fm",false)) {
+    waveTable.fm_iter = 0;
+  }
+
   waveTable.chipType = static_cast<CSE1_PACKED::CSE1_CHIP_VERSION>(flags.getInt("revision",1));
   amigaVolumeLike = flags.getBool("amiga_volume_like",false);
   waveTable.reset();

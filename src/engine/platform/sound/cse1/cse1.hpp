@@ -251,7 +251,7 @@ namespace CSE1_PACKED {
         CSE1_REG default_volume_line;
         CSE1_REG fastSpeed;
         CSE1_CHIP_VERSION chipType;
-        bool not_fm;
+        uint8_t fm_iter;
         bool enable_linear;
 
         CSE1_CONFIG_AND_TABLE();
